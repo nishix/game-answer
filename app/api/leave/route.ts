@@ -7,12 +7,12 @@ export const dynamic = "force-dynamic";
 /** タブ閉じ・リロード時に sendBeacon で退室するための API */
 export async function POST(request: Request) {
   try {
-    let body: unknown;
+    let body: { roomId?: unknown; playerId?: unknown } | null = null;
     try {
-      body = await request.json();
+      body = (await request.json()) as typeof body;
     } catch {
       const text = await request.text();
-      body = text ? JSON.parse(text) : null;
+      body = text ? (JSON.parse(text) as typeof body) : null;
     }
     const roomId = typeof body?.roomId === "string" ? body.roomId.trim() : null;
     const playerId = typeof body?.playerId === "string" ? body.playerId.trim() : null;
