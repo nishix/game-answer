@@ -416,6 +416,7 @@ function ExposureView({
                 onVote={onVote}
                 voteCount={voteCount}
                 hasVoted={hasVoted}
+                showVoteCount={false}
               />
             );
           })}

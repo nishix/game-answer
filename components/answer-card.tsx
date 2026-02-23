@@ -9,6 +9,8 @@ interface AnswerCardProps {
   onVote?: (answerId: string) => void
   voteCount?: number
   hasVoted?: boolean
+  /** 投票数を表示するか（false のときは投票中でも数を見せず、結果発表で驚きを残す） */
+  showVoteCount?: boolean
 }
 
 export function AnswerCard({
@@ -18,6 +20,7 @@ export function AnswerCard({
   onVote,
   voteCount = 0,
   hasVoted = false,
+  showVoteCount = true,
 }: AnswerCardProps) {
   const showVote = onVote != null && answerId != null
 
@@ -56,7 +59,7 @@ export function AnswerCard({
             <ThumbsUp
               className={`h-4 w-4 ${hasVoted ? "fill-[#818CF8] text-[#818CF8]" : "text-[#94A3B8]"}`}
             />
-            <span>{voteCount}</span>
+            {showVoteCount ? <span>{voteCount}</span> : null}
           </button>
         </div>
       ) : null}
