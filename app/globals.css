@@ -1,0 +1,308 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: #0F172A;
+  --foreground: #F1F5F9;
+  --card: rgba(255, 255, 255, 0.06);
+  --card-foreground: #F1F5F9;
+  --popover: #0F172A;
+  --popover-foreground: #F1F5F9;
+  --primary: #818CF8;
+  --primary-foreground: #0F172A;
+  --secondary: rgba(129, 140, 248, 0.15);
+  --secondary-foreground: #C7D2FE;
+  --muted: rgba(255, 255, 255, 0.08);
+  --muted-foreground: #94A3B8;
+  --accent: #34D399;
+  --accent-foreground: #0F172A;
+  --destructive: #F43F5E;
+  --destructive-foreground: #FFF1F2;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.08);
+  --ring: #818CF8;
+  --radius: 1rem;
+
+  --color-indigo: #818CF8;
+  --color-emerald: #34D399;
+  --color-rose: #F43F5E;
+  --color-navy: #0F172A;
+  --color-navy-light: #1E293B;
+}
+
+@theme inline {
+  --font-sans: 'Inter', sans-serif;
+  --font-serif: 'Playfair Display', serif;
+  --font-mono: 'Oswald', sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* Noise texture overlay - subtle grainy feel */
+@layer utilities {
+  .noise-overlay {
+    position: relative;
+  }
+  .noise-overlay::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    pointer-events: none;
+    opacity: 0.09;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 128px 128px;
+  }
+
+  /* Aurora Glass Lounge - strong glassmorphism (aurora shows through) */
+  .glass-input {
+    background: rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.12),
+      inset 0 -1px 0 0 rgba(0, 0, 0, 0.05),
+      0 0 0 1px rgba(96, 165, 250, 0.2),
+      0 0 20px -4px rgba(52, 211, 153, 0.2),
+      0 0 40px -10px rgba(34, 211, 238, 0.1);
+  }
+  .glass-input:focus {
+    outline: none;
+    border-color: rgba(52, 211, 153, 0.5);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.18),
+      0 0 0 1px rgba(52, 211, 153, 0.45),
+      0 0 28px rgba(52, 211, 153, 0.25),
+      0 0 48px -8px rgba(34, 211, 238, 0.15);
+  }
+  .glass-button {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.18),
+      inset 0 -1px 0 0 rgba(0, 0, 0, 0.08),
+      0 0 0 1px rgba(96, 165, 250, 0.18),
+      0 0 20px -4px rgba(52, 211, 153, 0.22),
+      0 0 40px -10px rgba(34, 211, 238, 0.08);
+  }
+  .glass-button:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(52, 211, 153, 0.4);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.28),
+      0 0 0 1px rgba(52, 211, 153, 0.5),
+      0 0 32px rgba(52, 211, 153, 0.3),
+      0 6px 24px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+  }
+  .glass-button-subtle {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+  }
+  .glass-button-subtle:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+  }
+  /* 青いガラス感のプライマリボタン（ルーム作成など） */
+  .glass-button-primary {
+    background: rgba(129, 140, 248, 0.22);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(129, 140, 248, 0.45);
+    color: #F1F5F9;
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.2),
+      inset 0 -1px 0 0 rgba(0, 0, 0, 0.06),
+      0 0 0 1px rgba(129, 140, 248, 0.25),
+      0 0 24px -4px rgba(129, 140, 248, 0.35),
+      0 0 48px -12px rgba(129, 140, 248, 0.15);
+  }
+  .glass-button-primary:hover:not(:disabled) {
+    background: rgba(129, 140, 248, 0.35);
+    border-color: rgba(129, 140, 248, 0.6);
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.28),
+      0 0 0 1px rgba(129, 140, 248, 0.4),
+      0 0 32px rgba(129, 140, 248, 0.4),
+      0 0 56px -8px rgba(129, 140, 248, 0.25),
+      0 4px 20px rgba(0, 0, 0, 0.15);
+  }
+  .glass-button-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .text-glow {
+    text-shadow:
+      0 0 24px rgba(255, 255, 255, 0.5),
+      0 0 48px rgba(255, 255, 255, 0.25),
+      0 0 72px rgba(52, 211, 153, 0.15);
+  }
+}
+
+/* Aurora background animation */
+@keyframes aurora-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+    opacity: 0.5;
+  }
+  25% {
+    background-position: 50% 0%;
+    opacity: 0.7;
+  }
+  50% {
+    background-position: 100% 50%;
+    opacity: 0.5;
+  }
+  75% {
+    background-position: 50% 100%;
+    opacity: 0.6;
+  }
+}
+
+@keyframes aurora-shift-2 {
+  0%, 100% {
+    background-position: 100% 0%;
+    opacity: 0.4;
+  }
+  33% {
+    background-position: 0% 100%;
+    opacity: 0.6;
+  }
+  66% {
+    background-position: 50% 50%;
+    opacity: 0.3;
+  }
+}
+
+/* 集計発表用：緊張感のある色変化の激しいオーロラ（短周期・強めのコントラスト） */
+@keyframes aurora-tense-1 {
+  0% {
+    background-position: 0% 20%;
+    opacity: 0.5;
+  }
+  20% {
+    background-position: 40% 80%;
+    opacity: 0.9;
+  }
+  40% {
+    background-position: 80% 10%;
+    opacity: 0.4;
+  }
+  60% {
+    background-position: 20% 60%;
+    opacity: 0.85;
+  }
+  80% {
+    background-position: 60% 40%;
+    opacity: 0.55;
+  }
+  100% {
+    background-position: 0% 20%;
+    opacity: 0.5;
+  }
+}
+
+@keyframes aurora-tense-2 {
+  0% {
+    background-position: 100% 80%;
+    opacity: 0.35;
+  }
+  25% {
+    background-position: 20% 20%;
+    opacity: 0.75;
+  }
+  50% {
+    background-position: 80% 90%;
+    opacity: 0.45;
+  }
+  75% {
+    background-position: 40% 50%;
+    opacity: 0.8;
+  }
+  100% {
+    background-position: 100% 80%;
+    opacity: 0.35;
+  }
+}
+
+@keyframes float-up {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-180px) scale(1.3);
+    opacity: 0;
+  }
+}
+
+@keyframes gentle-pulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes particle-glow {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.25);
+  }
+}
+
+@keyframes card-reveal {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
