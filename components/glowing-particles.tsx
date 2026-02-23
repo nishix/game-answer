@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 
-const PARTICLE_COUNT = 64;
+const PARTICLE_COUNT = 24;
 
 /** Deterministic PRNG so server and client render the same HTML (avoids hydration mismatch). */
 function createSeededRandom(seed: number) {
@@ -43,7 +43,7 @@ export function GlowingParticles() {
             top: `${p.y}%`,
             width: `${p.size}px`,
             height: `${p.size}px`,
-            boxShadow: `0 0 ${p.size * 4}px ${p.size * 1.5}px rgba(255,255,255,0.4), 0 0 ${p.size * 8}px ${p.size * 2}px rgba(52,211,153,0.15)`,
+            boxShadow: `0 0 ${p.size * 2}px rgba(255,255,255,0.25)`,
             animation: "particle-glow 4s ease-in-out infinite",
             animationDelay: `${p.delay}s`,
             animationDuration: `${p.duration}s`,

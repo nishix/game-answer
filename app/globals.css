@@ -278,12 +278,12 @@
 
 @keyframes particle-glow {
   0%, 100% {
-    opacity: 0.35;
+    opacity: 0.25;
     transform: scale(1);
   }
   50% {
-    opacity: 0.85;
-    transform: scale(1.25);
+    opacity: 0.55;
+    transform: scale(1.1);
   }
 }
 
