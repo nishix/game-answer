@@ -6,9 +6,12 @@ import {
   useGameStore,
   type RoomPhase,
 } from "@/lib/store/gameStore";
-import { getPlayersByRoom, updateRoomStatus } from "@/lib/supabase/rooms";
+import { getPlayersByRoom, getRoom, updateRoomStatus } from "@/lib/supabase/rooms";
 import { getAnswersByRoom } from "@/lib/supabase/answers";
 import { getVotesByRoom } from "@/lib/supabase/votes";
+
+/** Realtime が届かない場合のフォールバック: closeup/result 中は定期的に rooms を取得してフェーズを同期 */
+const ROOM_POLL_INTERVAL_MS = 2500;
 
 export function useGameRealtime(roomId: string | null): {
   isSubscribed: boolean;
@@ -17,6 +20,7 @@ export function useGameRealtime(roomId: string | null): {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const channelRef = useRef<ReturnType<ReturnType<typeof createClient>["channel"]> | null>(null);
 
+  const phase = useGameStore((s) => s.phase);
   const setRoomStatus = useGameStore((s) => s.setRoomStatus);
   const addIncomingReaction = useGameStore((s) => s.addIncomingReaction);
   const setPlayers = useGameStore((s) => s.setPlayers);
@@ -173,6 +177,21 @@ export function useGameRealtime(roomId: string | null): {
       setIsSubscribed(false);
     };
   }, [roomId, setRoomStatus, setPlayers, setVotes, addIncomingReaction]);
+
+  // Realtime (Postgres Changes) が有効でない場合のフォールバック: closeup/result 中は定期的に getRoom でフェーズを同期
+  useEffect(() => {
+    if (!roomId || (phase !== "closeup" && phase !== "result")) return;
+    const syncRoom = () => {
+      getRoom(roomId).then((room) => {
+        if (room?.status) {
+          setRoomStatus(room.status as RoomPhase, room.current_question);
+        }
+      });
+    };
+    syncRoom();
+    const interval = setInterval(syncRoom, ROOM_POLL_INTERVAL_MS);
+    return () => clearInterval(interval);
+  }, [roomId, phase, setRoomStatus]);
 
   return { isSubscribed, sendReaction };
 }

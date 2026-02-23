@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { useGameRealtime } from "@/hooks/useGameRealtime";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { useGameRealtimeContext } from "@/lib/contexts/GameRealtimeContext";
 import { useGameStore } from "@/lib/store/gameStore";
 
 const REACTIONS = [
@@ -18,21 +18,31 @@ interface ReactionBarProps {
 }
 
 export function ReactionBar({ roomId = null }: ReactionBarProps) {
-  const { sendReaction } = useGameRealtime(roomId ?? null);
+  const { sendReaction } = useGameRealtimeContext();
   const addIncomingReaction = useGameStore((s) => s.addIncomingReaction);
+  const incomingReactions = useGameStore((s) => s.incomingReactions);
 
   const [counts, setCounts] = useState<Record<string, number>>(() =>
     Object.fromEntries(REACTIONS.map((r) => [r.emoji, 0]))
   );
   const [activeEmoji, setActiveEmoji] = useState<string | null>(null);
+  const countedIdsRef = useRef<Set<string>>(new Set());
+
+  // 自分・他ユーザー問わず incomingReactions に追加された分だけカウントを増やす
+  useEffect(() => {
+    for (const r of incomingReactions) {
+      if (countedIdsRef.current.has(r.id)) continue;
+      countedIdsRef.current.add(r.id);
+      setCounts((prev) => ({ ...prev, [r.emoji]: (prev[r.emoji] ?? 0) + 1 }));
+    }
+  }, [incomingReactions]);
 
   const handleReaction = useCallback(
     (emoji: string, index: number) => {
-      setCounts((prev) => ({ ...prev, [emoji]: prev[emoji] + 1 }));
       setActiveEmoji(emoji);
       setTimeout(() => setActiveEmoji(null), 300);
 
-      // ローカル表示: store に追加 → FloatingEmojis が表示
+      // ローカル表示: store に追加 → FloatingEmojis 表示 + 上記 useEffect でカウント加算
       const baseX = 10 + index * 20;
       addIncomingReaction(emoji, baseX + (Math.random() * 10 - 5));
 
@@ -55,7 +65,7 @@ export function ReactionBar({ roomId = null }: ReactionBarProps) {
       />
 
       {/* Frosted glass bar - 5 buttons evenly spaced */}
-      <div className="border-t border-white/[0.08] bg-[#0F172A]/80 px-3 pb-8 pt-3 backdrop-blur-2xl">
+      <div className="border-t border-white/8 bg-[#0F172A]/80 px-3 pb-8 pt-3 backdrop-blur-2xl">
         <div className="mx-auto flex max-w-md items-center justify-between gap-1">
           {REACTIONS.map((reaction, index) => (
             <button
@@ -67,7 +77,7 @@ export function ReactionBar({ roomId = null }: ReactionBarProps) {
             >
               {/* Emoji button - glassmorphism + hover glow */}
               <div
-                className="relative flex h-12 w-12 items-center justify-center rounded-2xl border border-white/[0.1] bg-white/[0.06] text-xl backdrop-blur-xl transition-all duration-300 group-hover:border-white/[0.2] group-hover:bg-white/[0.1] group-hover:shadow-[0_0_15px_rgba(255,255,255,0.3)] group-active:shadow-[0_0_20px_rgba(255,255,255,0.4)]"
+                className="relative flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/6 text-xl backdrop-blur-xl transition-all duration-300 group-hover:border-white/20 group-hover:bg-white/10 group-hover:shadow-[0_0_15px_rgba(255,255,255,0.3)] group-active:shadow-[0_0_20px_rgba(255,255,255,0.4)]"
                 style={{
                   boxShadow:
                     activeEmoji === reaction.emoji

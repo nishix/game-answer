@@ -8,7 +8,7 @@ import { AnswerCard } from "@/components/answer-card";
 import { ReactionBar } from "@/components/reaction-bar";
 import { FloatingEmojis } from "@/components/floating-emojis";
 import { useGameStore, type RoomPhase } from "@/lib/store/gameStore";
-import { useGameRealtime } from "@/hooks/useGameRealtime";
+import { GameRealtimeProvider } from "@/lib/contexts/GameRealtimeContext";
 import { updateRoomStatus, getRoom, resolveRoom, getPlayersByRoom } from "@/lib/supabase/rooms";
 import { submitAnswer, getAnswersByRoom, deleteAnswersByRoom } from "@/lib/supabase/answers";
 import { submitVote, getVotesByRoom, deleteVotesByRoom } from "@/lib/supabase/votes";
@@ -389,11 +389,7 @@ function ExposureView({
 }) {
   return (
     <>
-      <QuestionHeader
-        question={question || "お題"}
-        roundNumber={1}
-        totalPlayers={totalPlayers}
-      />
+      <QuestionHeader question={question || "お題"} />
       <div className="flex-1 overflow-y-auto px-5 pb-40">
         <div className="mb-4 flex items-center gap-3">
           <div className="h-px flex-1 bg-gradient-to-r from-[#818CF8]/20 to-transparent" />
@@ -473,8 +469,6 @@ export default function RoomPage() {
   const isHost = Boolean(
     myPlayerId && players.find((p) => p.id === myPlayerId)?.is_host
   );
-
-  useGameRealtime(roomId);
 
   // タブ閉じ・リロード時も退室する（sendBeacon で確実に送る）。フックの順序を守るため早期 return より前に定義
   const leaveRef = useRef({ roomId: null as string | null, playerId: null as string | null });
@@ -712,8 +706,9 @@ export default function RoomPage() {
   return (
     <main className="noise-overlay relative min-h-dvh">
       <AuroraBackground />
-      {/* 参加コード・参加者一覧（全フェーズで表示）。スマホでは2段に分け、?・退室が質問と被らないようにする */}
-      <header className="absolute left-4 right-4 top-4 z-20 space-y-2 sm:flex sm:flex-wrap sm:items-center sm:justify-between sm:space-y-0 sm:gap-2">
+      <GameRealtimeProvider roomId={roomId}>
+        {/* 参加コード・参加者一覧（全フェーズで表示）。スマホでは2段に分け、?・退室が質問と被らないようにする */}
+        <header className="absolute left-4 right-4 top-4 z-20 space-y-2 sm:flex sm:flex-wrap sm:items-center sm:justify-between sm:space-y-0 sm:gap-2">
         <div className="glass-button-subtle flex min-w-0 flex-1 flex-wrap items-center gap-1.5 rounded-xl px-3 py-2">
           <span className="shrink-0 text-xs font-medium text-white/70">参加者 ({players.length}人)</span>
           <span className="flex flex-wrap gap-1.5">
@@ -772,11 +767,12 @@ export default function RoomPage() {
             </div>
           </div>
         </div>
-      </header>
-      <HelpModal open={helpOpen} onOpenChange={setHelpOpen} />
-      <div className="relative z-10 flex min-h-dvh flex-col pt-28 sm:pt-[4.5rem]">
-        {phaseUI[phase]}
-      </div>
+        </header>
+        <HelpModal open={helpOpen} onOpenChange={setHelpOpen} />
+        <div className="relative z-10 flex min-h-dvh flex-col pt-28 sm:pt-[4.5rem]">
+          {phaseUI[phase]}
+        </div>
+      </GameRealtimeProvider>
     </main>
   );
 }
