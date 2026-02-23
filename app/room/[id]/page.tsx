@@ -712,8 +712,8 @@ export default function RoomPage() {
   return (
     <main className="noise-overlay relative min-h-dvh">
       <AuroraBackground />
-      {/* 参加コード・参加者一覧（全フェーズで表示） */}
-      <div className="absolute left-4 right-4 top-4 z-20 flex flex-wrap items-center justify-between gap-2">
+      {/* 参加コード・参加者一覧（全フェーズで表示）。スマホでは2段に分け、?・退室が質問と被らないようにする */}
+      <header className="absolute left-4 right-4 top-4 z-20 space-y-2 sm:flex sm:flex-wrap sm:items-center sm:justify-between sm:space-y-0 sm:gap-2">
         <div className="glass-button-subtle flex min-w-0 flex-1 flex-wrap items-center gap-1.5 rounded-xl px-3 py-2">
           <span className="shrink-0 text-xs font-medium text-white/70">参加者 ({players.length}人)</span>
           <span className="flex flex-wrap gap-1.5">
@@ -730,49 +730,51 @@ export default function RoomPage() {
             ))}
           </span>
         </div>
-        <div className="glass-button-subtle flex shrink-0 items-center gap-2 rounded-xl px-3 py-2">
-          <span className="text-xs font-medium text-white/70">参加コード</span>
-          <code className="max-w-[8rem] truncate font-mono text-xs tracking-widest text-white/90" title={displayCode}>
-            {displayCode}
-          </code>
-          <button
-            type="button"
-            onClick={handleCopyCode}
-            className="shrink-0 rounded-lg px-2 py-1 text-[10px] font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-            aria-label="参加コードをコピー"
-          >
-            {copied ? "コピー済み" : "コピー"}
-          </button>
-        </div>
-        <div className="flex shrink-0 items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setHelpOpen(true)}
-            className="glass-button-subtle flex h-9 w-9 items-center justify-center rounded-xl text-base font-medium text-white/90 transition-colors hover:text-white"
-            aria-label="ヘルプを開く"
-            title="ヘルプ (?)"
-          >
-            ?
-          </button>
-          <div>
-            {leaveError ? (
-              <p className="mb-1 text-right text-[10px] text-[#F43F5E]" role="alert">
-                {leaveError}
-              </p>
-            ) : null}
+        <div className="flex flex-shrink-0 items-center justify-between gap-2 sm:contents">
+          <div className="glass-button-subtle flex shrink-0 items-center gap-2 rounded-xl px-3 py-2">
+            <span className="text-xs font-medium text-white/70">参加コード</span>
+            <code className="max-w-[8rem] truncate font-mono text-xs tracking-widest text-white/90" title={displayCode}>
+              {displayCode}
+            </code>
             <button
               type="button"
-              onClick={handleLeaveRoom}
-              disabled={leaving}
-              className="glass-button-subtle rounded-xl px-3 py-2 text-xs font-medium text-white/90 transition-colors hover:text-white disabled:opacity-50"
+              onClick={handleCopyCode}
+              className="shrink-0 rounded-lg px-2 py-1 text-[10px] font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+              aria-label="参加コードをコピー"
             >
-              {leaving ? "退室中…" : "ルームを出る"}
+              {copied ? "コピー済み" : "コピー"}
             </button>
           </div>
+          <div className="flex shrink-0 items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setHelpOpen(true)}
+              className="glass-button-subtle flex h-9 w-9 items-center justify-center rounded-xl text-base font-medium text-white/90 transition-colors hover:text-white"
+              aria-label="ヘルプを開く"
+              title="ヘルプ (?)"
+            >
+              ?
+            </button>
+            <div>
+              {leaveError ? (
+                <p className="mb-1 text-right text-[10px] text-[#F43F5E]" role="alert">
+                  {leaveError}
+                </p>
+              ) : null}
+              <button
+                type="button"
+                onClick={handleLeaveRoom}
+                disabled={leaving}
+                className="glass-button-subtle rounded-xl px-3 py-2 text-xs font-medium text-white/90 transition-colors hover:text-white disabled:opacity-50"
+              >
+                {leaving ? "退室中…" : "ルームを出る"}
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      </header>
       <HelpModal open={helpOpen} onOpenChange={setHelpOpen} />
-      <div className="relative z-10 flex min-h-dvh flex-col pt-[4.5rem]">
+      <div className="relative z-10 flex min-h-dvh flex-col pt-28 sm:pt-[4.5rem]">
         {phaseUI[phase]}
       </div>
     </main>
